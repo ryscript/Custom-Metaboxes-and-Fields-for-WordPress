@@ -633,7 +633,34 @@ class cmb_Meta_Box_types {
 	public static function text_money_repeat( $field, $meta ) {
 		self::repeat_text_field( $meta, 'cmb_text_money' );
 	}
-
+	
+	public static function user_select( $field, $meta ) {
+		if( empty( $meta ) && !empty( $field['std'] ) )
+			$meta = $field['std'];
+		
+		echo '<select name="', $field['id'], '" id="', $field['id'], '">';
+			$args = array(
+				'orderby' 	=> 'post_count',
+				'order' 	=> 'ASC'
+			);
+			
+			// User Query
+			$user_query = new WP_User_Query( $args );
+			
+			// Get the results
+			$users = $user_query->get_results();
+				
+			// Check for results
+			if ( ! empty( $users ) )
+			{
+				foreach ( $users as $user )
+					echo '<option value="' , $user->ID , '" ', $meta == $user->ID ? ' selected="selected"' : '' ,'>' . $user->display_name . '</option>';
+			} else {
+				echo 'There\'s no user added yet!';
+			}
+			
+		echo '</select>', self::desc( $field['desc'], true );
+	}
 
 	/**
 	 * Default fallback. Allows rendering fields via "cmb_render_$name" hook
